@@ -79,7 +79,7 @@ class Stats:
         asia = stats["as"]
         agg = stats["agg"]
 
-        return await self.statbot.say("```{} skill levels are currently as follows for game mode {}:\n"
+        return await self.statbot.say("```{} skill levels for {}:\n\n"
                                       "NA: {}\n"
                                       "AS: {}\n"
                                       "Aggregate: {}```".format(player, mode, na, asia, agg))
