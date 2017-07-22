@@ -8,18 +8,22 @@ class Stats:
         self.conn = sqlite3.connect('db/statbot.db')
         self.cur = self.conn.cursor()
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, help="!beers\n\n"
+                                              "Displays the amount of total beers logged.")
     async def beers(self, ctx):
         user = ctx.message.author
         self.cur.execute("SELECT total_beers FROM beers WHERE username = ?;", (user.id,))
         total_beers = self.cur.fetchone()
 
         if total_beers is None:
-            return await self.statbot.say("You have yet to register any beers.")
+            return await self.statbot.say("```You have yet to register any beers.```")
+        if total_beers == 1:
+            return await self.statbot.say("```Just 1.... I remember my first beer.```")
         else:
-            return await self.statbot.say("So far you've downed a total of " + str(total_beers[0]) + " beers.")
+            return await self.statbot.say("```So far you've downed a total of " + str(total_beers[0]) + " beers.```")
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, help="!addbeer\n\n"
+                                              "Adds one beer to todays and total beers logged.")
     async def addbeer(self, ctx):
         user = ctx.message.author
         self.cur.execute("SELECT total_beers FROM beers WHERE username = ?;", (user.id,))
@@ -37,8 +41,8 @@ class Stats:
         self.cur.execute("SELECT total_beers FROM beers WHERE username = ?;", (user.id,))
         total_beers = self.cur.fetchone()
 
-        return await self.statbot.say("Your beer has been added to your count. You're currently on beer " +
-                                      str(total_beers[0]) + ".")
+        return await self.statbot.say("```Your beer has been added to your count. You're currently on beer " +
+                                      str(total_beers[0]) + ".```")
 
 
 def setup(statbot):
