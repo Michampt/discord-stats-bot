@@ -47,8 +47,5 @@ class Stats:
         return await self.statbot.say(string)
 
 
-
-
-
 def setup(statbot):
     statbot.add_cog(Stats(statbot))
