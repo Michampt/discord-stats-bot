@@ -16,24 +16,40 @@ class Stats:
                                                "agg = Aggregate (combined)")
     async def pubstats(self, *args):
 
-        player = args[0]
-        mode = args[1]
-        region = args[2]
+        if not args:
+            return await self.statbot.say("```" + self.pubstats.help + "```")
+        else:
+            player = args[0]
+
+        if len(args) < 3:
+            return await self.statbot.say("```" + self.pubstats.help + "```")
+
+        if not args[1]:
+            return await self.statbot.say("```" + self.pubstats.help + "```")
+
+        if not args[2]:
+            return await self.statbot.say("```" + self.pubstats.help + "```")
 
         if args[1] not in ['solo', 'duo', 'squad']:
             return await self.statbot.say("Mode must be solo duo or squad")
+        else:
+            mode = args[1]
 
         if args[2] not in ['as', 'na', 'agg']:
             return await self.statbot.say("Region must be as, na or agg")
-
-        stats = self.api.player_mode_stats(player, game_mode=mode, game_region=region)
-        if not stats:
-            return await self.statbot.say("{} user has no stats for game mode: {} in region: {}".format(player,
+        else:
+            region = args[2]
+        try:
+            stats = self.api.player_mode_stats(player, game_mode=mode, game_region=region)
+            if not stats:
+                return await self.statbot.say("{} user has no stats for game mode: {} in region: {}".format(player,
                                                                                                         mode,
                                                                                                         region))
-        else:
-            stats = stats[0]
-        stats = stats["Stats"]
+            else:
+                stats = stats[0]
+            stats = stats["Stats"]
+        except KeyError:
+            return await self.statbot.say("Player not found")
 
         statlist = []
 
@@ -65,29 +81,41 @@ class Stats:
     @commands.command(pass_context=False, help="!pubskill <name> <mode>\n\n"
                                                "Displays the players skill levels in all regions and aggregate")
     async def pubskill(self, *args):
-        player = args[0]
-        mode = args[1]
+        if not args:
+            return await self.statbot.say("```" + self.pubskill.help + "```")
+        else:
+            player = args[0]
+
+        if len(args) < 2:
+            return await self.statbot.say("```" + self.pubskill.help + "```")
 
         if args[1] not in ['solo', 'duo', 'squad']:
             return await self.statbot.say("Mode must be solo duo or squad")
+        else:
+            mode = args[1]
 
-        stats = self.api.player_skill(player, game_mode=mode)
-        if not stats:
-            return await self.statbot.say("{} user has no skills recorded for game mode: {}".format(player, mode))
+        try:
+            stats = self.api.player_skill(player, game_mode=mode)
+            if not stats:
+                return await self.statbot.say("{} user has no skills recorded for game mode: {}".format(player, mode))
 
-        s = "```{} skill levels for {}:\n\n".format(player, mode)
+            s = "```{} skill levels for {}:\n\n".format(player, mode)
 
-        if 'na' in stats:
-            s = s + "NA: {}\n".format(stats["na"])
+            if 'na' in stats:
+                s = s + "NA: {}\n".format(stats["na"])
 
-        if 'as' in stats:
-            s = s + "Asia: {}\n".format(stats["as"])
+            if 'as' in stats:
+                s = s + "Asia: {}\n".format(stats["as"])
 
-        if 'agg' in stats:
-            s = s + "Agg: {}\n".format(stats["agg"])
+            if 'agg' in stats:
+                s = s + "Agg: {}\n".format(stats["agg"])
 
-        s = s + "```"
-        return await self.statbot.say(s)
+            s = s + "```"
+            return await self.statbot.say(s)
+        except KeyError:
+            return await self.statbot.say("Player not found")
+
+
 
 
 def setup(statbot):
