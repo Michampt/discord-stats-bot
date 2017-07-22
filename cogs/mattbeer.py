@@ -17,8 +17,8 @@ class Stats:
 
         if total_beers is None:
             return await self.statbot.say("```You have yet to register any beers.```")
-        if total_beers == 1:
-            return await self.statbot.say("```Just 1.... I remember my first beer.```")
+        if total_beers[0] == 1:
+            return await self.statbot.say("```Just 1...``` https://media.giphy.com/media/xTkcEQhPwfXLCfTGQ8/giphy.gif")
         else:
             return await self.statbot.say("```So far you've downed a total of " + str(total_beers[0]) + " beers.```")
 
