@@ -75,14 +75,19 @@ class Stats:
         if not stats:
             return await self.statbot.say("{} user has no skills recorded for game mode: {}".format(player, mode))
 
-        na = stats["na"]
-        asia = stats["as"]
-        agg = stats["agg"]
+        s = "```{} skill levels for {}:\n\n".format(player, mode)
 
-        return await self.statbot.say("```{} skill levels for {}:\n\n"
-                                      "NA: {}\n"
-                                      "AS: {}\n"
-                                      "Aggregate: {}```".format(player, mode, na, asia, agg))
+        if 'na' in stats:
+            s = s + "NA: {}\n".format(stats["na"])
+
+        if 'as' in stats:
+            s = s + "Asia: {}\n".format(stats["as"])
+
+        if 'agg' in stats:
+            s = s + "Agg: {}\n".format(stats["agg"])
+
+        s = s + "```"
+        return await self.statbot.say(s)
 
 
 def setup(statbot):
