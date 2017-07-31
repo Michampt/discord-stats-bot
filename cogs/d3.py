@@ -1,5 +1,6 @@
-import secrets
+import secrets, json
 from discord.ext import commands
+from urllib import request as req
 
 
 class D3Stats:
@@ -11,15 +12,94 @@ class D3Stats:
         self.statbot = statbot
         self.key = secrets.BATTLENET_KEY
 
-    @commands.command(pass_context=False, help="!d3char <name> realm")
-    async def d3char(self, *args):
-        char = args[0]
-        realm = args[1]
+    @commands.command(pass_context=False, help="!d3hero <battletag (e.g. rauxz-1162)> <character name>")
+    async def d3hero(self, *args):
+        battletag = args[0]
+        char = args[1]
 
-        character = "https://us.api.battle.net/{}/character/{}/{}?locale=en_US&apikey=".format(self.game,
-                                                                                               self.key,
-                                                                                               realm,
-                                                                                               char)
+        url_for_id = 'https://us.api.battle.net/d3/profile/{}/?locale=en_US&apikey={}'.format(battletag, self.key)
+        response = req.urlopen(url_for_id)
+        profile = json.loads(response.read())
+
+        for hero in profile['heroes']:
+            if hero['name'] == char:
+                heroid = hero['id']
+                break
+
+        herourl = "https://us.api.battle.net/d3/profile/{}/hero/{}?locale=en_US&apikey={}".format(battletag,
+                                                                                                  heroid,
+                                                                                                  self.key)
+
+        response = req.urlopen(herourl)
+        heroprofile = json.loads(response.read())
+
+        s = "```Name: {}\n" \
+            "Class: {}\n" \
+            "Level: {}\n" \
+            "Paragon Level: {}\n" \
+            "Elites Killed: {}\n```".format(heroprofile['name'],
+                                            heroprofile['class'],
+                                            heroprofile['level'],
+                                            heroprofile['paragonLevel'],
+                                            heroprofile['kills']['elites'])
+
+        return await self.statbot.say(s)
+
+    @commands.command(pass_context=False, help="!d3gear <battletag (e.g. rauxz-1162)> <character name>")
+    async def d3gear(self, *args):
+        battletag = args[0]
+        char = args[1]
+
+        url_for_id = 'https://us.api.battle.net/d3/profile/{}/?locale=en_US&apikey={}'.format(battletag, self.key)
+        response = req.urlopen(url_for_id)
+        profile = json.loads(response.read())
+
+        for hero in profile['heroes']:
+            if hero['name'] == char:
+                heroid = hero['id']
+                break
+
+        herourl = "https://us.api.battle.net/d3/profile/{}/hero/{}?locale=en_US&apikey={}".format(battletag,
+                                                                                                  heroid,
+                                                                                                  self.key)
+
+        response = req.urlopen(herourl)
+        heroprofile = json.loads(response.read())
+
+        itemlist = heroprofile['items']
+
+        s = "```Name: {}\n" \
+            "Class: {}\n" \
+            "Level: {}\n" \
+            "Paragon Level: {}\n\n".format(heroprofile['name'],
+                                           heroprofile['class'],
+                                           heroprofile['level'],
+                                           heroprofile['paragonLevel'])
+
+        for item in itemlist:
+            if item in ['head', 'shoulders', 'torso', 'neck', 'bracers', 'torso', 'hands', 'waist', 'legs',
+                        'leftFinger', 'rightFinger', 'mainHand', 'offHand']:
+                itemcode = itemlist[item]['tooltipParams']
+                itemcodeurl = "https://us.api.battle.net/d3/data/{}?locale=en_US&apikey={}".format(itemcode,
+                                                                                                   self.key)
+                itemresponse = req.urlopen(itemcodeurl)
+                itemstats = json.loads(itemresponse.read())
+                stat_string = ""
+
+                prim = itemstats['attributes']['primary']
+                #sec = itemstats['attributes']['secondary']
+                #passive = itemstats['attributes']['passive']
+                for stat in prim:
+                    stat_string = stat_string + "\n\t" + stat['text']
+                #for stat in sec:
+                    #stat_string = stat_string + ", " + stat['text']
+                #for stat in passive:
+                    #stat_string = stat_string + ", " + stat['text']
+
+                s = s + item.title() + ": " + itemlist[item]['name'] + "\t" + stat_string + "\n"
+
+        s = s + "```"
+        return await self.statbot.say(s)
 
 
 def setup(statbot):
