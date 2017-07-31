@@ -96,8 +96,8 @@ class WowStats:
                                                    character['totalHonorableKills'],
                                                    character['achievementPoints']))
 
-    @commands.command(pass_context=False, help="!wowchar <name> <realm>")
-    async def wowarmory(self, *args):
+    @commands.command(pass_context=False, help="!wowgear <name> <realm>")
+    async def wowgear(self, *args):
         char = args[0]
         realm = args[1]
 
