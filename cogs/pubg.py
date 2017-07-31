@@ -116,7 +116,5 @@ class Stats:
             return await self.statbot.say("Player not found")
 
 
-
-
 def setup(statbot):
     statbot.add_cog(Stats(statbot))
