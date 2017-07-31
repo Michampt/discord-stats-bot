@@ -143,6 +143,12 @@ class WowStats:
             chest = "Chest: None\n"
 
         try:
+            hands = "Hands: " + character['items']['hands']['name'] + " " + "(" + \
+                       str(character['items']['hands']['itemLevel']) + ")\n"
+        except KeyError:
+            hands = "Hands: None\n"
+
+        try:
             wrist = "Wrist: " + character['items']['wrist']['name'] + " " + "(" + \
                     str(character['items']['wrist']['itemLevel']) + ")\n"
         except KeyError:
@@ -202,8 +208,8 @@ class WowStats:
         except KeyError:
             offhand = "Off Hand: None\n"
 
-        s = s + head + neck + shoulder + back + chest + wrist + waist + legs + feet + finger1 + finger2 + trinket1 + \
-            trinket2 + mainhand + offhand + "```"
+        s = s + head + neck + shoulder + back + chest + hands + wrist + waist + legs + feet + finger1 + finger2 + \
+            trinket1 + trinket2 + mainhand + offhand + "```"
 
         return await self.statbot.say(s)
 
