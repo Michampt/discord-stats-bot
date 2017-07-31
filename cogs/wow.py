@@ -210,3 +210,4 @@ class WowStats:
 
 def setup(statbot):
     statbot.add_cog(WowStats(statbot))
+
