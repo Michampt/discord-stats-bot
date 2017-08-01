@@ -24,12 +24,6 @@ class Stats:
         if len(args) < 3:
             return await self.statbot.say("```" + self.pubstats.help + "```")
 
-        if not args[1]:
-            return await self.statbot.say("```" + self.pubstats.help + "```")
-
-        if not args[2]:
-            return await self.statbot.say("```" + self.pubstats.help + "```")
-
         if args[1] not in ['solo', 'duo', 'squad']:
             return await self.statbot.say("Mode must be solo duo or squad")
         else:
