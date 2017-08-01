@@ -14,13 +14,24 @@ class D3Stats:
 
     @commands.command(pass_context=False, help="!d3hero <battletag (e.g. rauxz-1162)> <character name>")
     async def d3hero(self, *args):
+
+        if not args:
+            return await self.statbot.say("```" + self.d3hero.help + "```")
+
+        if len(args) < 2:
+            return await self.statbot.say("```" + self.d3hero.help + "```")
+
         battletag = args[0]
+        battletag = battletag.lower()
+
         char = args[1]
+        char = char.lower()
 
         url_for_id = 'https://us.api.battle.net/d3/profile/{}/?locale=en_US&apikey={}'.format(battletag, self.key)
         response = req.urlopen(url_for_id)
         profile = json.loads(response.read())
 
+        heroid = ""
         for hero in profile['heroes']:
             if hero['name'] == char:
                 heroid = hero['id']
@@ -33,20 +44,27 @@ class D3Stats:
         response = req.urlopen(herourl)
         heroprofile = json.loads(response.read())
 
-        s = "```Name: {}\n" \
-            "Class: {}\n" \
-            "Level: {}\n" \
-            "Paragon Level: {}\n" \
-            "Elites Killed: {}\n```".format(heroprofile['name'],
-                                            heroprofile['class'],
-                                            heroprofile['level'],
-                                            heroprofile['paragonLevel'],
-                                            heroprofile['kills']['elites'])
+        s = "**Name**: {}\n" \
+            "**Class**: {}\n" \
+            "**Level**: {}\n" \
+            "**Paragon Level**: {}\n" \
+            "**Elites Killed**: {}\n".format(heroprofile['name'],
+                                             heroprofile['class'],
+                                             heroprofile['level'],
+                                             heroprofile['paragonLevel'],
+                                             heroprofile['kills']['elites'])
 
         return await self.statbot.say(s)
 
     @commands.command(pass_context=False, help="!d3gear <battletag (e.g. rauxz-1162)> <character name>")
     async def d3gear(self, *args):
+
+        if not args:
+            return await self.statbot.say("```" + self.d3gear.help + "```")
+
+        if len(args) < 2:
+            return await self.statbot.say("```" + self.d3gear.help + "```")
+
         battletag = args[0]
         char = args[1]
 
@@ -54,6 +72,7 @@ class D3Stats:
         response = req.urlopen(url_for_id)
         profile = json.loads(response.read())
 
+        heroid = ""
         for hero in profile['heroes']:
             if hero['name'] == char:
                 heroid = hero['id']
@@ -68,13 +87,13 @@ class D3Stats:
 
         itemlist = heroprofile['items']
 
-        s = "```Name: {}\n" \
-            "Class: {}\n" \
-            "Level: {}\n" \
-            "Paragon Level: {}\n\n".format(heroprofile['name'],
-                                           heroprofile['class'],
-                                           heroprofile['level'],
-                                           heroprofile['paragonLevel'])
+        s = "**Name**: {}\n" \
+            "**Class**: {}\n" \
+            "**Level**: {}\n" \
+            "**Paragon Level**: {}\n\n".format(heroprofile['name'],
+                                               heroprofile['class'],
+                                               heroprofile['level'],
+                                               heroprofile['paragonLevel'])
 
         for item in itemlist:
             if item in ['head', 'shoulders', 'torso', 'neck', 'bracers', 'torso', 'hands', 'waist', 'legs',
@@ -96,9 +115,7 @@ class D3Stats:
                 #for stat in passive:
                     #stat_string = stat_string + ", " + stat['text']
 
-                s = s + item.title() + ": " + itemlist[item]['name'] + "\t" + stat_string + "\n"
-
-        s = s + "```"
+                s = s + "**" + item.title() + "**: " + itemlist[item]['name'] + "\t" + stat_string + "\n"
         return await self.statbot.say(s)
 
 

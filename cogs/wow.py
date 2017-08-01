@@ -46,8 +46,18 @@ class WowStats:
 
     @commands.command(pass_context=False, help="!wowchar <name> <realm>")
     async def wowchar(self, *args):
+
+        if not args:
+            return await self.statbot.say("'''" + self.wowchar.help + "```")
+
+        if len(args) < 2:
+            return await self.statbot.say("'''" + self.wowchar.help + "'''")
+
         char = args[0]
+        char = char.lower()
+
         realm = args[1]
+        realm = realm.lower()
 
         url = "https://us.api.battle.net/{}/character/{}/{}?locale=en_US&apikey={}".format(self.game,
                                                                                            realm,
@@ -57,49 +67,62 @@ class WowStats:
         response = req.urlopen(url)
         character = json.loads(response.read())
 
+        race = ""
         for k, v in self.races.items():
             if v == character['race']:
                 race = k
                 break
 
+        char_class = ""
         for k, v in self.classes.items():
             if v == character['class']:
                 char_class = k
                 break
 
+        gender = ""
         for k, v in self.genders.items():
             if v == character['gender']:
                 gender = k
                 break
 
+        faction = ""
         for k, v in self.factions.items():
             if v == character['faction']:
                 faction = k
                 break
 
-        return await self.statbot.say("```Character: {}\n"
-                                      "Realm: {}\n"
-                                      "Level: {}\n"
-                                      "Faction: {}\n"
-                                      "Gender: {}\n"
-                                      "Race: {}\n"
-                                      "Class: {}\n"
-                                      "Total HK: {}\n"
-                                      "Achievement Points: {}\n"
-                                      "```".format(character['name'],
-                                                   character['realm'],
-                                                   character['level'],
-                                                   faction,
-                                                   gender,
-                                                   race,
-                                                   char_class,
-                                                   character['totalHonorableKills'],
-                                                   character['achievementPoints']))
+        return await self.statbot.say("**Character**: {}\n"
+                                      "**Realm**: {}\n"
+                                      "**Level**: {}\n"
+                                      "**Faction**: {}\n"
+                                      "**Gender**: {}\n"
+                                      "**Race**: {}\n"
+                                      "**Class**: {}\n"
+                                      "**Total HK**: {}\n"
+                                      "**Achievement Points**: {}\n".format(character['name'],
+                                                                            character['realm'],
+                                                                            character['level'],
+                                                                            faction,
+                                                                            gender,
+                                                                            race,
+                                                                            char_class,
+                                                                            character['totalHonorableKills'],
+                                                                            character['achievementPoints']))
 
     @commands.command(pass_context=False, help="!wowgear <name> <realm>")
     async def wowgear(self, *args):
+
+        if not args:
+            return await self.statbot.say("```" + self.wowgear.help + "```")
+
+        if len(args) < 2:
+            return await self.statbot.say("```" + self.wowgear.help + "```")
+
         char = args[0]
+        char = char.lower()
+
         realm = args[1]
+        realm = realm.lower()
 
         url = "https://us.api.battle.net/{}/character/{}/{}?fields=items&locale=en_US&apikey={}".format(self.game,
                                                                                                         realm,
@@ -109,107 +132,17 @@ class WowStats:
         response = req.urlopen(url)
         character = json.loads(response.read())
 
-        s = "```Character: " + character['name'] + "\n" + "Realm: " + character['realm'] + "\n"
-        s = s + "Average Item Level (Equipped): " + str(character['items']['averageItemLevelEquipped']) + "\n\n"
+        s = "**Character**: " + character['name'] + "\n" + "**Realm**: " + character['realm'] + "\n"
+        s = s + "**Average Item Level (Equipped)**: " + str(character['items']['averageItemLevelEquipped']) + "\n\n"
 
-        try:
-            head = "Head: " + character['items']['head']['name'] + " " + "(" + \
-                   str(character['items']['head']['itemLevel']) + ")\n"
-        except KeyError:
-            head = "Head: None\n"
-
-        try:
-            neck = "Neck: " + character['items']['neck']['name'] + " " + "(" + \
-                   str(character['items']['neck']['itemLevel']) + ")\n"
-        except KeyError:
-            neck = "Neck: None\n"
-
-        try:
-            shoulder = "Shoulder: " + character['items']['shoulder']['name'] + " " + "(" + \
-                       str(character['items']['shoulder']['itemLevel']) + ")\n"
-        except KeyError:
-            shoulder = "Shoulder: None\n"
-
-        try:
-            back = "Back: " + character['items']['back']['name'] + " " + "(" + \
-                   str(character['items']['back']['itemLevel']) + ")\n"
-        except KeyError:
-            back = "Back: None\n"
-
-        try:
-            chest = "Chest: " + character['items']['chest']['name'] + " " + "(" + \
-                    str(character['items']['chest']['itemLevel']) + ")\n"
-        except KeyError:
-            chest = "Chest: None\n"
-
-        try:
-            hands = "Hands: " + character['items']['hands']['name'] + " " + "(" + \
-                       str(character['items']['hands']['itemLevel']) + ")\n"
-        except KeyError:
-            hands = "Hands: None\n"
-
-        try:
-            wrist = "Wrist: " + character['items']['wrist']['name'] + " " + "(" + \
-                    str(character['items']['wrist']['itemLevel']) + ")\n"
-        except KeyError:
-            wrist = "Wrist: None\n"
-
-        try:
-            waist = "Waist: " + character['items']['waist']['name'] + " " + "(" + \
-                    str(character['items']['waist']['itemLevel']) + ")\n"
-        except KeyError:
-            waist = "Waist: None\n"
-
-        try:
-            legs = "Legs: " + character['items']['legs']['name'] + " " + "(" + \
-                    str(character['items']['legs']['itemLevel']) + ")\n"
-        except KeyError:
-            legs = "Legs: None\n"
-
-        try:
-            feet = "Feet: " + character['items']['feet']['name'] + " " + "(" + \
-                   str(character['items']['feet']['itemLevel']) + ")\n"
-        except KeyError:
-            feet = "Feet: None\n"
-
-        try:
-            finger1 = "Finger: " + character['items']['finger1']['name'] + " " + "(" + \
-                      str(character['items']['finger1']['itemLevel']) + ")\n"
-        except KeyError:
-            finger1 = "Finger: None\n"
-
-        try:
-            finger2 = "Finger: " + character['items']['finger2']['name'] + " " + "(" + \
-                      str(character['items']['finger2']['itemLevel']) + ")\n"
-        except KeyError:
-            finger2 = "Finger: None\n"
-
-        try:
-            trinket1 = "Trinket: " + character['items']['trinket1']['name'] + " " + "(" + \
-                       str(character['items']['trinket1']['itemLevel']) + ")\n"
-        except KeyError:
-            trinket1 = "Trinket: None\n"
-
-        try:
-            trinket2 = "Trinket: " + character['items']['trinket2']['name'] + " " + "(" + \
-                       str(character['items']['trinket2']['itemLevel']) + ")\n"
-        except KeyError:
-            trinket1 = "Trinket: None\n"
-
-        try:
-            mainhand = "Main Hand: " + character['items']['mainHand']['name'] + " " + "(" + \
-                       str(character['items']['mainHand']['itemLevel']) + ")\n"
-        except KeyError:
-            mainhand = "Main Hand: None\n"
-
-        try:
-            offhand = "Off Hand: " + character['items']['offHand']['name'] + " " + "(" + \
-                      str(character['items']['offHand']['itemLevel']) + ")\n"
-        except KeyError:
-            offhand = "Off Hand: None\n"
-
-        s = s + head + neck + shoulder + back + chest + hands + wrist + waist + legs + feet + finger1 + finger2 + \
-            trinket1 + trinket2 + mainhand + offhand + "```"
+        for itemtype in character['items']:
+            if itemtype in ['head', 'neck', 'shoulder', 'back', 'chest', 'wrist', 'waist', 'legs', 'feet', 'finger1',
+                            'finger2', 'trinket1', 'trinket2', 'mainHand', 'offHand']:
+                try:
+                    item = character['items'][itemtype]
+                    s = s + "**" + itemtype.title() + "**: " + item['name'] + " (" + str(item['itemLevel']) + ")\n"
+                except KeyError:
+                    s = s + "**" + itemtype.title() + "**:\n"
 
         return await self.statbot.say(s)
 
