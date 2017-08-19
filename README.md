@@ -22,5 +22,3 @@ Just replace your tokens in secrets.py
 * edit secrets.py with your keys
 * run ```docker build --tag statsbot .```
 * run the container with ```docker run -d statsbot:latest```
-
-The mattbeer module is just a joke, you don't need it.
