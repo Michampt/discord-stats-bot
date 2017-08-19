@@ -15,7 +15,7 @@ Python 3.6 required (Provided in the python docker image)
 
 Just replace your tokens in secrets.py
 * BOT_TOKEN = discord bot token
-* PUBG_STATS_TOKEN = pubgtracker token from pubgtracker
+* PUBG_STATS_TOKEN = pubgtracker token
 * BATTLENET_KEY = battlenet api key
 
 ## Creating a Docker image:
