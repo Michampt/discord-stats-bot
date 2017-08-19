@@ -19,7 +19,7 @@ Just replace your tokens in secrets.py
 
 ## Creating a Docker image:
 * edit secrets.py with your keys
-* run ```bash docker build --tag statsbot .```
-* run the container with ```bash docker run statsbot:latest```
+* run ```docker build --tag statsbot .```
+* run the container with ```docker run statsbot:latest```
 
 The mattbeer module is just a joke, you don't need it.
