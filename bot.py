@@ -3,7 +3,7 @@ from discord.ext.commands import Bot
 import secrets
 
 statbot = Bot(command_prefix='!')
-startup_extensions = ['cogs.pubg', 'cogs.mattbeer', 'cogs.wow', 'cogs.d3']
+startup_extensions = ['cogs.pubg', 'cogs.wow', 'cogs.d3']
 
 conn = sqlite3.connect('db/statbot.db')
 cur = conn.cursor()
