@@ -1,6 +1,7 @@
 # discord-pubg-stats-bot
 Discord bot for various game stats
-Python 3.6 required
+
+Python 3.6 required (Provided in the python docker image)
 
 ## modules needed:
 * discord
@@ -20,6 +21,6 @@ Just replace your tokens in secrets.py
 ## Creating a Docker image:
 * edit secrets.py with your keys
 * run ```docker build --tag statsbot .```
-* run the container with ```docker run statsbot:latest```
+* run the container with ```docker run -d statsbot:latest```
 
 The mattbeer module is just a joke, you don't need it.
