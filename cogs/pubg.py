@@ -66,7 +66,7 @@ class Stats:
                                  "Knock Outs"]:
                 statlist.append(stat["label"] + ": " + stat["value"] + "\n")
 
-        string = "```{} stats for {}:{}".format(mode, player, "\n\n")
+        string = "```{} stats for {}:{}".format(mode.title(), player.title(), "\n\n")
         for s in statlist:
             string = string + s
         string = string + "```"
