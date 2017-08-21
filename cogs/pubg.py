@@ -66,7 +66,7 @@ class Stats:
                                  "Knock Outs"]:
                 statlist.append(stat["label"] + ": " + stat["value"] + "\n")
 
-        string = "```{} stats for {}:{}".format(mode.title(), player.title(), "\n\n")
+        string = "```{} stats for {}:{}".format(mode.upper(), player.title(), "\n\n")
         for s in statlist:
             string = string + s
         string = string + "```"
@@ -91,7 +91,7 @@ class Stats:
         try:
             stats = self.api.player_skill(player, game_mode=mode)
             if not stats:
-                return await self.statbot.say("{} user has no skills recorded for game mode: {}".format(player, mode))
+                return await self.statbot.say("{} has no skills recorded for {} in {}".format(player.title(), mode.upper(), region.upper()))
 
             s = "```{} skill levels for {}:\n\n".format(player, mode)
 
