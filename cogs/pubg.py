@@ -40,7 +40,7 @@ class Stats:
                                                                                                         mode,
                                                                                                         region))
             else:
-                stats = stats[0]
+                stats = stats[len(stats)-1]
             stats = stats["Stats"]
         except KeyError:
             return await self.statbot.say("Player not found")
