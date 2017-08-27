@@ -13,6 +13,9 @@ class Stats:
                                                "EXAMPLE: !pubstats rauxz duo na\n\n"
                                                "na = North America\n"
                                                "as = Asia\n"
+                                               "eu = Europe\n"
+                                               "oc = Oceania\n"
+                                               "sa = South America\n"
                                                "agg = Aggregate (combined)")
     async def pubstats(self, *args):
 
@@ -29,7 +32,7 @@ class Stats:
         else:
             mode = args[1]
 
-        if args[2] not in ['as', 'na', 'agg']:
+        if args[2] not in ['as', 'na', 'agg', 'eu', 'oc', 'sa']:
             return await self.statbot.say("Region must be as, na or agg")
         else:
             region = args[2]
@@ -50,6 +53,7 @@ class Stats:
         for stat in stats:
             if stat["label"] in ["K/D Ratio",
                                  "Win %",
+                                 "Rounds Played"
                                  "Wins",
                                  "Top 10s",
                                  "Losses",
@@ -61,10 +65,13 @@ class Stats:
                                  "Road Kills",
                                  "Round Most Kills",
                                  "Longest Kill",
+                                 "Max Kills Streak"
                                  "Heals",
                                  "Revives",
-                                 "Knock Outs"]:
-                statlist.append(stat["label"] + ": " + stat["value"] + "\n")
+                                 "Knock Outs",
+                                 "Average Walk Distance",
+                                 "Average Ride Distance"]:
+                statlist.append("" + stat["label"] + ": " + stat["value"] + "\n")
 
         string = "```{} stats for {}:{}".format(mode.upper(), player.title(), "\n\n")
         for s in statlist:
@@ -96,10 +103,19 @@ class Stats:
             s = "```{} skill levels for {}:\n\n".format(player, mode)
 
             if 'na' in stats:
-                s = s + "NA: {}\n".format(stats["na"])
+                s = s + "North America: {}\n".format(stats["na"])
+
+            if 'eu' in stats:
+                s = s + "Europe: {} \n".format(stats["eu"])
 
             if 'as' in stats:
                 s = s + "Asia: {}\n".format(stats["as"])
+
+            if 'oc' in stats:
+                s = s + "Oceania: {} \n".format(stats["oc"])
+
+            if 'sa' in stats:
+                s = s + "South America: {} \n".format(stats["sa"])
 
             if 'agg' in stats:
                 s = s + "Agg: {}\n".format(stats["agg"])
