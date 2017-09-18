@@ -16,7 +16,7 @@ class Stats:
                                                "eu = Europe\n"
                                                "oc = Oceania\n"
                                                "sa = South America\n"
-                                               "agg = Aggregate (combined)")
+                                               "agg = Aggregate (combined/average)")
     async def pubstats(self, *args):
 
         if not args:
@@ -27,13 +27,13 @@ class Stats:
         if len(args) < 3:
             return await self.statbot.say("```" + self.pubstats.help + "```")
 
-        if args[1] not in ['solo', 'duo', 'squad']:
-            return await self.statbot.say("Mode must be solo duo or squad")
+        if args[1] not in ['solo', 'duo', 'squad', 'duo-fpp', 'solo-fpp', 'squad-fpp']:
+            return await self.statbot.say("Mode must be solo, duo, squad. (Add -fpp for First Person Perspective")
         else:
             mode = args[1]
 
         if args[2] not in ['as', 'na', 'agg', 'eu', 'oc', 'sa']:
-            return await self.statbot.say("Region must be as, na or agg")
+            return await self.statbot.say("Region must be as, na, eu, oc, sa, or agg")
         else:
             region = args[2]
         try:
@@ -90,7 +90,7 @@ class Stats:
         if len(args) < 2:
             return await self.statbot.say("```" + self.pubskill.help + "```")
 
-        if args[1] not in ['solo', 'duo', 'squad']:
+        if args[1] not in ['solo', 'duo', 'squad', 'solo-fpp', 'duo-fpp', 'squad-fpp']:
             return await self.statbot.say("Mode must be solo duo or squad")
         else:
             mode = args[1]
