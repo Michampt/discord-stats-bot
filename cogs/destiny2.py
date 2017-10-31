@@ -1,13 +1,11 @@
-import secrets
+import secrets, pydest
 from discord.ext import commands
-from pypubg import core
 
 
 class Stats:
     def __init__(self, statbot):
         self.statbot = statbot
-        self.api = core.PUBGAPI(secrets.PUBG_STATS_TOKEN)
-
+	destiny = pydest.Pydest(secrets.DESTINY2_KEY)
     @commands.command(pass_context=False, help="!pubstats <name> <mode> <region>\n\n"
                                                "Displays a few stats from the chosen game mode on the chosen region\n\n"
                                                "EXAMPLE: !pubstats rauxz duo na\n\n"

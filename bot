@@ -1,0 +1,10 @@
+#! /bin/bash
+
+if [ ${1} == "start" ]
+then
+	echo "Starting StatBot"
+	cd /opt/bot/discord-pubg-stats-bot
+	/usr/bin/python3.6 /opt/bot/discord-pubg-stats-bot/bot.py
+else
+	echo "Usage: bot start"
+fi
