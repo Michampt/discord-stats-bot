@@ -1,128 +1,43 @@
-import secrets, pydest
+import secrets, pydest, sqlite3
 from discord.ext import commands
 
 
-class Stats:
+class Destiny2:
+
     def __init__(self, statbot):
         self.statbot = statbot
-	destiny = pydest.Pydest(secrets.DESTINY2_KEY)
-    @commands.command(pass_context=False, help="!pubstats <name> <mode> <region>\n\n"
-                                               "Displays a few stats from the chosen game mode on the chosen region\n\n"
-                                               "EXAMPLE: !pubstats rauxz duo na\n\n"
-                                               "na = North America\n"
-                                               "as = Asia\n"
-                                               "eu = Europe\n"
-                                               "oc = Oceania\n"
-                                               "sa = South America\n"
-                                               "agg = Aggregate (combined/average)")
-    async def pubstats(self, *args):
+        self.conn = sqlite3.connect('db/statbot.db')
+        self.cur = self.conn.cursor()
+        self.platforms = {'XBOX': 1, 'PLAYSTATION': 2, 'PC': 4}
+        self.destiny = pydest.Pydest(secrets.DESTINY2_KEY)
 
-        if not args:
-            return await self.statbot.say("```" + self.pubstats.help + "```")
+    @commands.command(pass_context=True, help="!register <BattleNet ID> <platform>")
+    async def register(self, ctx, *args):
+        bnet_id = args[0]
+        bnet_id_web = bnet_id.replace("#", "%23")
+        platform = self.platforms.get(args[1].upper())
+        result = await self.destiny.api.search_destiny_player(platform, bnet_id_web)
+        member_id = result['Response'][0]['membershipId']
+        sender = ctx.message.author
+        if result['ErrorCode'] == 1 and len(result['Response']) > 0:
+            self.cur.execute("INSERT INTO DESTINY_USERS (DISCORD_USER_ID, BATTLE_NET_ID, BUNGIE_MEMBER_ID, PLATFORM)"
+                             "values (?, ?, ?, ?);", (sender.mention, bnet_id, member_id, platform))
+            self.conn.commit()
+            return await self.statbot.say(sender.mention + " You have successfully registered using {} on {}".format(
+                bnet_id, args[1]))
         else:
-            player = args[0]
+            return await self.statbot.say("{} Unfortunately I could not retrieve your member ID from Bungie.\n"
+                                          "Please ensure you have submitted the correct "
+                                          "BattleNet tag and platform".format(
+                                            sender.mention, bnet_id, platform))
+        #TODO set to if exists, delete the row and add over it. Do now allow the user to have multiple entries.
 
-        if len(args) < 3:
-            return await self.statbot.say("```" + self.pubstats.help + "```")
+    @commands.command(pass_context=False, help="!destinystats <character name>")
+    async def destinystats(self, *args):
+        #TODO lookup in the db, the member ID and go get the user's character(s).
 
-        if args[1] not in ['solo', 'duo', 'squad', 'duo-fpp', 'solo-fpp', 'squad-fpp']:
-            return await self.statbot.say("Mode must be solo, duo, squad. (Add -fpp for First Person Perspective)")
-        else:
-            mode = args[1]
-
-        if args[2] not in ['as', 'na', 'agg', 'eu', 'oc', 'sa']:
-            return await self.statbot.say("Region must be as, na, eu, oc, sa, or agg")
-        else:
-            region = args[2]
-        try:
-            stats = self.api.player_mode_stats(player, game_mode=mode, game_region=region)
-            if not stats:
-                return await self.statbot.say("{} user has no stats for game mode: {} in region: {}".format(player,
-                                                                                                        mode,
-                                                                                                        region))
-            else:
-                stats = stats[len(stats)-1]
-            stats = stats["Stats"]
-        except KeyError:
-            return await self.statbot.say("Player not found")
-
-        statlist = []
-
-        for stat in stats:
-            if stat["label"] in ["K/D Ratio",
-                                 "Win %",
-                                 "Rounds Played"
-                                 "Wins",
-                                 "Top 10s",
-                                 "Losses",
-                                 "Kills",
-                                 "Assists",
-                                 "Suicides",
-                                 "Team Kills",
-                                 "Headshot Kills",
-                                 "Road Kills",
-                                 "Round Most Kills",
-                                 "Longest Kill",
-                                 "Max Kills Streak"
-                                 "Heals",
-                                 "Revives",
-                                 "Knock Outs",
-                                 "Average Walk Distance",
-                                 "Average Ride Distance"]:
-                statlist.append("" + stat["label"] + ": " + stat["value"] + "\n")
-
-        string = "```{} stats for {}:{}".format(mode.upper(), player.title(), "\n\n")
-        for s in statlist:
-            string = string + s
-        string = string + "```"
-        return await self.statbot.say(string)
-
-    @commands.command(pass_context=False, help="!pubskill <name> <mode>\n\n"
-                                               "Displays the players skill levels in all regions and aggregate")
-    async def pubskill(self, *args):
-        if not args:
-            return await self.statbot.say("```" + self.pubskill.help + "```")
-        else:
-            player = args[0]
-
-        if len(args) < 2:
-            return await self.statbot.say("```" + self.pubskill.help + "```")
-
-        if args[1] not in ['solo', 'duo', 'squad', 'solo-fpp', 'duo-fpp', 'squad-fpp']:
-            return await self.statbot.say("Mode must be solo duo or squad")
-        else:
-            mode = args[1]
-
-        try:
-            stats = self.api.player_skill(player, game_mode=mode)
-            if not stats:
-                return await self.statbot.say("{} has no skills recorded for {} in {}".format(player.title(), mode.upper(), region.upper()))
-
-            s = "```{} skill levels for {}:\n\n".format(player, mode)
-
-            if 'na' in stats:
-                s = s + "North America: {}\n".format(stats["na"])
-
-            if 'eu' in stats:
-                s = s + "Europe: {} \n".format(stats["eu"])
-
-            if 'as' in stats:
-                s = s + "Asia: {}\n".format(stats["as"])
-
-            if 'oc' in stats:
-                s = s + "Oceania: {} \n".format(stats["oc"])
-
-            if 'sa' in stats:
-                s = s + "South America: {} \n".format(stats["sa"])
-
-            if 'agg' in stats:
-                s = s + "Agg: {}\n".format(stats["agg"])
-
-            s = s + "```"
-            return await self.statbot.say(s)
-        except KeyError:
-            return await self.statbot.say("Player not found")
+        return await self.statbot.say()
 
 
 def setup(statbot):
-    statbot.add_cog(Stats(statbot))
+    statbot.add_cog(Destiny2(statbot))
