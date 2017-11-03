@@ -1,4 +1,4 @@
-import secrets, pydest, sqlite3
+import secrets, pydest, sqlite3, json
 from discord.ext import commands
 
 
@@ -9,14 +9,15 @@ class Destiny2:
         self.conn = sqlite3.connect('db/statbot.db')
         self.cur = self.conn.cursor()
         self.platforms = {'XBOX': 1, 'PLAYSTATION': 2, 'PC': 4}
+        self.races = {0: 'Human', 1: 'Awoken', 2: 'Exo'}
+        self.classes = {0: 'Titan', 1 : 'Hunter', 2: 'Warlock', }
+        self.genders = {0: 'Male', 1: 'Female'}
         self.destiny = pydest.Pydest(secrets.DESTINY2_KEY)
 
     @commands.command(pass_context=True, help="!register <BattleNet ID> <platform>\n"
                                               "Registering while already having an existing entry will overwrite "
                                               "the previous entry.")
     async def register(self, ctx, *args):
-        if not args:
-            return await self.statbot.say("```" + self.register.help + "```")
         if len(args) < 2:
             return await self.statbot.say("```" + self.register.help + "```")
 
@@ -40,12 +41,41 @@ class Destiny2:
                                           "BattleNet tag and platform".format(
                                             sender.mention, bnet_id, platform))
 
-    @commands.command(pass_context=False, help="!destinystats <character name>")
-    async def destinystats(self, *args):
-        #TODO lookup in the db, the member ID, and go get the user's character(s).
-        #TODO if the user does not have a member ID registered, tell them to register it.
+    @commands.command(pass_context=True, help="!destinycharacters <character name>")
+    async def destinycharacters(self, ctx, *args):
 
-        return await self.statbot.say()
+        sender = ctx.message.author
+        discord_id = sender.id
+        components = ["200"]
+
+        self.cur.execute("SELECT BUNGIE_MEMBER_ID, PLATFORM FROM DESTINY_USERS WHERE DISCORD_USER_ID=?;", (discord_id,))
+        result = self.cur.fetchone()
+
+        member_id = result[0]
+        platform = result[1]
+
+        if not result:
+            return await self.statbot.say("{} You need to register your battlenet ID first using: !register.\n"
+                                          + "```" + self.register.help + "```".format(sender.mention))
+        else:
+            response = await self.destiny.api.get_profile(platform, member_id, components)
+            chars = response["Response"]["characters"]["data"]
+            string = ""
+            for character in chars:
+                char = chars[character]
+                race = char["raceType"]
+                race = self.races.get(race)
+                level = char["levelProgression"]["level"]
+                class_type = char["classType"]
+                class_type = self.classes.get(class_type)
+                gender = char["genderType"]
+                gender = self.genders.get(gender)
+                light = char["light"]
+                emblem = "https://www.bungie.net" + char["emblemPath"]
+                string = string + "```Level: {}\nGender: {}\nRace: {}\nClass: {}\nLight: {}\n```".format(
+                    level, gender, race, class_type, light,)
+
+                return await self.statbot.say(string)
 
 
 def setup(statbot):
