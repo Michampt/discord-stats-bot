@@ -60,7 +60,7 @@ class Destiny2:
         else:
             response = await self.destiny.api.get_profile(platform, member_id, components)
             chars = response["Response"]["characters"]["data"]
-            string = ""
+            string = "{}: ".format(sender.name)
             for character in chars:
                 char = chars[character]
                 race = char["raceType"]
@@ -75,7 +75,7 @@ class Destiny2:
                 string = string + "```Level: {}\nGender: {}\nRace: {}\nClass: {}\nLight: {}\n```".format(
                     level, gender, race, class_type, light,)
 
-                return await self.statbot.say(string)
+        return await self.statbot.say(string)
 
 
 def setup(statbot):
