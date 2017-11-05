@@ -1,4 +1,4 @@
-import secrets, pydest, sqlite3, json
+import secrets, pydest, sqlite3, math
 from discord.ext import commands
 
 
@@ -63,6 +63,13 @@ class Destiny2:
             string = "{}: ".format(sender.name)
             for character in chars:
                 char = chars[character]
+                minutes_total = int(char["minutesPlayedTotal"])
+                if int(minutes_total) < 60:
+                    playtime = minutes_total
+                    playtime = "{} Minutes".format(playtime)
+                else:
+                    playtime = str(math.ceil(minutes_total/60))
+                    playtime = "{} Hours".format(playtime)
                 race = char["raceType"]
                 race = self.races.get(race)
                 level = char["levelProgression"]["level"]
@@ -72,8 +79,9 @@ class Destiny2:
                 gender = self.genders.get(gender)
                 light = char["light"]
                 emblem = "https://www.bungie.net" + char["emblemPath"]
-                string = string + "```Level: {}\nGender: {}\nRace: {}\nClass: {}\nLight: {}\n```".format(
-                    level, gender, race, class_type, light,)
+                string = string + "```Level: {}\nGender: {}\nRace: {}\nClass: {}\nLight: {}\n" \
+                                  "Playtime: {}\n```".format(
+                    level, gender, race, class_type, light, playtime)
 
         return await self.statbot.say(string)
 
