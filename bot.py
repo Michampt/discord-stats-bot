@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import discord, sqlite3, logging
 from discord.ext.commands import Bot
 import secrets
